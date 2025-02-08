@@ -2,6 +2,7 @@ package pl.spinali.todo.service;
 
 import org.springframework.stereotype.Service;
 import pl.spinali.todo.dto.request.TaskRequest;
+import pl.spinali.todo.dto.request.TaskStatusRequest;
 import pl.spinali.todo.dto.response.TaskResponse;
 import pl.spinali.todo.model.Task;
 import pl.spinali.todo.repository.TaskRepository;
@@ -28,6 +29,7 @@ public class TaskService {
         return tasks.stream().map(taskMapper::toTaskResponse).collect(Collectors.toList());
     }
     public TaskResponse createTask(TaskRequest taskRequest) {
+        taskRequest.setCompleted(false);
         Task task = taskRepository.save(taskMapper.toTask(taskRequest));
         return taskMapper.toTaskResponse(task);
     }
@@ -41,5 +43,12 @@ public class TaskService {
         Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
         taskRepository.delete(task);
         return taskMapper.toTaskResponse(task);
+    }
+
+    public TaskResponse updateCompletionStatus(Long id, boolean completed) {
+        Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
+        task.setCompleted(completed);
+        Task updatedTask = taskRepository.save(task);
+        return taskMapper.toTaskResponse(updatedTask);
     }
 }
