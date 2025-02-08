@@ -20,7 +20,7 @@ public class Task {
     @NonNull
     private String title;
     private String description;
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @NonNull
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -28,7 +28,7 @@ public class Task {
     @NonNull
     private LocalDateTime dueAt;
     @Column(nullable = false)
-    private boolean completed;
+    private boolean completed = false;
 
     public Task(@NonNull String title, String description, @NonNull LocalDateTime createdAt, LocalDateTime updatedAt, @NonNull LocalDateTime dueAt, boolean completed) {
         this.title = title;
@@ -37,5 +37,15 @@ public class Task {
         this.updatedAt = updatedAt;
         this.dueAt = dueAt;
         this.completed = completed;
+    }
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }
