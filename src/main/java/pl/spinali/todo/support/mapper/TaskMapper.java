@@ -7,8 +7,6 @@ import pl.spinali.todo.model.Task;
 
 @Component
 public class TaskMapper {
-
-
     public Task toTask(TaskRequest taskRequest) {
         return new Task(taskRequest.getTitle(), taskRequest.getDescription(), taskRequest.getCreatedAt(), taskRequest.getUpdatedAt(), taskRequest.getDueAt(), taskRequest.isCompleted());
     }
@@ -23,5 +21,9 @@ public class TaskMapper {
                 task.getDueAt(),
                 task.isCompleted()
         );
+    }
+
+    public Task toTask(Task task, TaskRequest taskRequest) {
+        return new Task(task.getId(), taskRequest.getTitle(), taskRequest.getDescription(), taskRequest.getCreatedAt(), taskRequest.getUpdatedAt(), taskRequest.getDueAt(), taskRequest.isCompleted());
     }
 }

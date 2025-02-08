@@ -7,20 +7,38 @@ import pl.spinali.todo.model.Task;
 import pl.spinali.todo.repository.TaskRepository;
 import pl.spinali.todo.support.mapper.TaskMapper;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     public TaskService(TaskRepository taskRepository, TaskMapper taskMapper) {
         this.taskRepository = taskRepository;
-        this.taskMapper = new TaskMapper();
+        this.taskMapper = taskMapper;
     }
     public TaskResponse getTaskById(Long id) {
         Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
         return taskMapper.toTaskResponse(task);
     }
+    public List<TaskResponse> getAllTasks() {
+        List<Task> tasks = taskRepository.findAll();
+        return tasks.stream().map(taskMapper::toTaskResponse).collect(Collectors.toList());
+    }
     public TaskResponse createTask(TaskRequest taskRequest) {
         Task task = taskRepository.save(taskMapper.toTask(taskRequest));
+        return taskMapper.toTaskResponse(task);
+    }
+    public TaskResponse updateTask(TaskRequest taskRequest, Long id){
+        Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
+        taskRepository.save(taskMapper.toTask(task, taskRequest));
+        return taskMapper.toTaskResponse(task);
+    }
+
+    public TaskResponse deleteTask(Long id) {
+        Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
+        taskRepository.delete(task);
         return taskMapper.toTaskResponse(task);
     }
 }

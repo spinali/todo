@@ -13,4 +13,13 @@ public class TaskRequest {
     private LocalDateTime updatedAt;
     private LocalDateTime dueAt;
     private boolean completed;
+
+    public TaskRequest(String title, String description, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime dueAt, boolean completed) {
+        this.title = title;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.dueAt = dueAt;
+        this.completed = completed;
+    }
 }
