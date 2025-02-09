@@ -29,12 +29,14 @@ public class TaskService {
         return tasks.stream().map(taskMapper::toTaskResponse).collect(Collectors.toList());
     }
     public TaskResponse createTask(TaskRequest taskRequest) {
+        taskRequest.setCreatedAt(LocalDateTime.now());
         taskRequest.setCompleted(false);
         Task task = taskRepository.save(taskMapper.toTask(taskRequest));
         return taskMapper.toTaskResponse(task);
     }
     public TaskResponse updateTask(TaskRequest taskRequest, Long id){
         Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
+        task.setCompleted(taskRequest.isCompleted());
         taskRepository.save(taskMapper.toTask(task, taskRequest));
         return taskMapper.toTaskResponse(task);
     }
