@@ -14,8 +14,8 @@ import pl.spinali.todo.service.TaskService;
 import java.util.ArrayList;
 import java.util.List;
 
-@Controller
-@RequestMapping("/api")
+@RestController
+@RequestMapping("/api/tasks")
 public class TaskController {
     private final TaskService taskService;
     public TaskController(TaskService taskService) {
@@ -33,10 +33,11 @@ public class TaskController {
         List<TaskResponse> taskResponses = new ArrayList<>(taskService.getAllTasks());
         return new ResponseEntity<>(taskResponses, HttpStatus.OK);
     }
-    @PostMapping("/add")
+    @PostMapping()
     @Operation(summary = "create new task")
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest){
+    public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest taskRequest){
         TaskResponse taskResponse = taskService.createTask(taskRequest);
+        System.out.println("Otrzymano dueAt: " + taskResponse.getDueAt());
         return new ResponseEntity<>(taskResponse, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")

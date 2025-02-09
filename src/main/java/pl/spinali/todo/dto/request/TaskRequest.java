@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 
 import java.time.LocalDateTime;
-
+@NoArgsConstructor
 @Data
 public class TaskRequest {
     private String title;
