@@ -9,6 +9,7 @@ import pl.spinali.todo.repository.TaskRepository;
 import pl.spinali.todo.support.mapper.TaskMapper;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,5 +53,27 @@ public class TaskService {
         task.setCompleted(completed);
         Task updatedTask = taskRepository.save(task);
         return taskMapper.toTaskResponse(updatedTask);
+    }
+
+    public List<TaskResponse> getFilteredTasks(Boolean completed, LocalDateTime dueAt) {
+        List<Task> tasks = taskRepository.findAll();
+
+        if (dueAt != null) {
+            tasks = tasks.stream()
+                    .filter(task -> task.getDueAt().isBefore(dueAt))
+                    .collect(Collectors.toList());
+        }
+
+        if (Boolean.TRUE.equals(completed)) {
+            tasks = tasks.stream()
+                    .filter(Task::isCompleted)
+                    .collect(Collectors.toList());
+        } else if (Boolean.FALSE.equals(completed)) {
+            tasks = tasks.stream()
+                    .filter(task -> !task.isCompleted())
+                    .collect(Collectors.toList());
+        }
+
+        return tasks.stream().map(taskMapper::toTaskResponse).collect(Collectors.toList());
     }
 }

@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import taskService from '../services/taskService';
+import TaskService from "../services/taskService";
 
 const createTaskStore = () => {
     const { subscribe, set } = writable([]);
@@ -29,6 +30,10 @@ const createTaskStore = () => {
             await taskService.updateTaskStatus(id, status);
             const tasks = await taskService.getTasks();
             set(tasks);
+        },
+        fetchFilteredTasks: async (completed, dueAt) => {
+            const filteredTasks = await taskService.fetchFilteredTasks(completed, dueAt);
+            set(filteredTasks);
         }
     };
 };
