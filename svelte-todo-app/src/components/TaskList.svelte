@@ -1,7 +1,8 @@
 <script>
-    import { tasks } from '../store/taskStore';
+    import {tasks} from '../store/taskStore';
+
     let isEditing = false;
-    let editedTask = { id: null, title: '', description: '', dueAt: '' };
+    let editedTask = {id: null, title: '', description: '', dueAt: ''};
     let completedFilter = null;
     let dueAtFilter = '';
 
@@ -20,7 +21,7 @@
 
     const startEdit = (task) => {
         isEditing = true;
-        editedTask = { ...task };
+        editedTask = {...task};
     };
 
     const handleEdit = async () => {
@@ -48,64 +49,80 @@
         }
     };
 
-    const resetFilter=()=>{
+    const resetFilter = () => {
         dueAtFilter = '';
         completedFilter = '';
         handleFilter();
     }
 </script>
 
-<h2>Task List</h2>
 
-<div class="filters uk-margin-bottom">
-    <label>
-        Completed:
-        <select  bind:value={completedFilter} class="uk-select">
-            <option selected= "selected" value="">All</option>
-            <option value="true">Done</option>
-            <option value="false">Pending</option>
-        </select>
-    </label>
+<div class="uk-flex uk-flex-center uk-margin-small-bottom">
+    <div class="uk-flex">
+        <div class="uk-card uk-card-default uk-padding-small uk-text-center">
+            <div class="uk-grid-small" uk-grid>
+                <label>
+                    Completed:
+                    <select bind:value={completedFilter} class="uk-select uk-form-small">
+                        <option selected="selected" value="">All</option>
+                        <option value="true">Done</option>
+                        <option value="false">Pending</option>
+                    </select>
+                </label>
 
-    <label>
-        Due Date:
-        <input type="datetime-local" bind:value={dueAtFilter} class="uk-input" />
-    </label>
+                <label>
+                    Due Date:
+                    <input type="datetime-local" bind:value={dueAtFilter} class="uk-input uk-form-small" />
+                </label>
 
-    <button class="uk-button uk-button-primary" on:click={handleFilter}>Apply Filters</button>
-    <button class="uk-button uk-button-primary" on:click={resetFilter}>Reset</button>
+                <button class="uk-button uk-button-primary uk-button-small" on:click={handleFilter}>Apply Filters</button>
+                <button class="uk-button uk-button-default uk-button-small" on:click={resetFilter}>Reset</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-{#each $tasks as task (task.id)}
-    <div class="uk-card {task.completed ? 'completed' : ''} uk-card-default uk-card-body uk-margin-small">
-        {#if isEditing && editedTask.id === task.id}
-            <h3 class="uk-card-title">Editing Task</h3>
-            <input bind:value={editedTask.title} class="uk-input uk-margin-small" placeholder="Edit title" />
-            <input bind:value={editedTask.description} class="uk-input uk-margin-small" placeholder="Edit description" />
-            <input bind:value={editedTask.dueAt} type="datetime-local" class="uk-input uk-margin-small" placeholder="Edit Due Date" />
-            <div class="uk-button-group">
-                <button class="uk-button uk-button-primary" on:click={handleEdit}>Save</button>
-                <button class="uk-button uk-button-default" on:click={() => (isEditing = false)}>Cancel</button>
+<div class="uk-grid-match uk-grid-small uk-child-width-1-3@m uk-child-width-1-2@s uk-text-center uk-padding-large margin" uk-grid>
+    {#each $tasks as task (task.id)}
+        <div>
+            <div class="uk-card uk-card-default uk-card-body uk-text-left  {task.completed ? 'completed' : ''}">
+                {#if isEditing && editedTask.id === task.id}
+                    <h3 class="uk-card-title">Editing Task</h3>
+                    <input bind:value={editedTask.title} class="uk-input uk-margin-small" placeholder="Edit title"/>
+                    <textarea bind:value={editedTask.description} class="uk-textarea uk-margin-small"
+                              placeholder="Edit description"></textarea>
+                    <input bind:value={editedTask.dueAt} type="datetime-local" class="uk-input uk-margin-small"
+                           placeholder="Edit Due Date"/>
+                    <div class="uk-button-group">
+                        <button class="uk-button uk-button-primary" on:click={handleEdit}>Save</button>
+                        <button class="uk-button uk-button-default" on:click={() => (isEditing = false)}>Cancel</button>
+                    </div>
+                {:else}
+                    <h3 class="uk-card-title">{task.title}</h3>
+                    <p><strong>Due Date:</strong> {formatEuropeanDate(task.dueAt)}</p>
+
+                    <div class="uk-overflow-auto uk-height-medium">
+                        <pre style="border: none;">
+                            {task.description}
+                        </pre>
+                    </div>
+
+                    <div class="uk-button-group">
+                        <button class="uk-button uk-button-secondary" on:click={() => startEdit(task)}>Edit</button>
+                        <button class="uk-button uk-button-success" on:click={() => handleStatus(task)}>
+                            {task.completed ? 'Done' : 'Pending'}
+                        </button>
+                        <button class="uk-button uk-button-danger" on:click={() => handleDelete(task.id)}>Delete
+                        </button>
+                    </div>
+                {/if}
             </div>
-        {:else}
-            <h3 class="uk-card-title">{task.title}</h3>
-            <p>{task.description}</p>
-            <p><strong>Due Date:</strong> {formatEuropeanDate(task.dueAt)}</p>
-            <p><strong>Status:</strong> {task.completed ? 'Completed' : 'Incomplete'}</p>
-            <div class="uk-button-group">
-                <button class="uk-button uk-button-secondary" on:click={() => startEdit(task)}>Edit</button>
-                <button class="uk-button uk-button-success" on:click={() => handleStatus(task)}>
-                    {task.completed ? '✔ Completed' : '❌ Pending'}
-                </button>
-                <button class="uk-button uk-button-danger" on:click={() => handleDelete(task.id)}>Delete</button>
-            </div>
-        {/if}
-    </div>
-{/each}
+        </div>
+    {/each}
+</div>
 
 <style>
     .completed {
-        text-decoration: line-through;
         opacity: 40%;
     }
 

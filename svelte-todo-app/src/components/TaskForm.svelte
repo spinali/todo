@@ -34,11 +34,11 @@
 
     <div class="uk-margin">
         <label class="uk-form-label" for="description">Description</label>
-        <input
+        <textarea
                 id="description"
-                type="text"
                 bind:value={description}
                 placeholder="Description"
+                maxLength="255"
                 class="uk-input"
         />
     </div>
