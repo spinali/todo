@@ -2,6 +2,7 @@ package pl.spinali.todo.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -11,6 +12,7 @@ import pl.spinali.todo.dto.request.TaskStatusRequest;
 import pl.spinali.todo.dto.response.TaskResponse;
 import pl.spinali.todo.service.TaskService;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +39,6 @@ public class TaskController {
     @Operation(summary = "create new task")
     public ResponseEntity<TaskResponse> createTask(@Valid @RequestBody TaskRequest taskRequest){
         TaskResponse taskResponse = taskService.createTask(taskRequest);
-        System.out.println("Otrzymano dueAt: " + taskResponse.getDueAt());
         return new ResponseEntity<>(taskResponse, HttpStatus.CREATED);
     }
     @PutMapping("/{id}")
@@ -59,5 +60,15 @@ public class TaskController {
             @Valid @RequestBody TaskStatusRequest taskStatusRequest) {
         TaskResponse taskResponse = taskService.updateCompletionStatus(id, taskStatusRequest.getCompleted());
         return new ResponseEntity<>(taskResponse, HttpStatus.OK);
+    }
+    @GetMapping("/filter")
+    @Operation(summary = "get tasks with optional filters")
+    public ResponseEntity<List<TaskResponse>> getFilteredTasks(
+            @RequestParam(required = false) Boolean completed,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dueAt
+            ) {
+        List<TaskResponse> taskResponses = taskService.getFilteredTasks(completed, dueAt);
+        return new ResponseEntity<>(taskResponses, HttpStatus.OK);
+
     }
 }

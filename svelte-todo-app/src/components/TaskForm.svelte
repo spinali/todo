@@ -13,7 +13,6 @@
         const newTask = { title, description, dueAt };
         await tasks.addTask(newTask);
 
-        // Resetowanie formularza
         title = '';
         description = '';
         dueAt = '';

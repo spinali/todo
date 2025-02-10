@@ -12,7 +12,6 @@
 	import {onMount} from 'svelte';
 	import {tasks} from './store/taskStore.js';
 
-	// Pobieranie zadań po uruchomieniu aplikacji
 	onMount(() => {
 		tasks.fetchTasks();
 	});

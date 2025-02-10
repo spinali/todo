@@ -52,6 +52,28 @@ const taskService = {
             throw new Error('Failed to update task');
         }
         return response.json();
+    },
+    async fetchFilteredTasks(completed, dueAt) {
+        const queryParams = new URLSearchParams();
+
+        if (completed !== null) {
+            queryParams.append('completed', completed);
+        }
+
+        if (dueAt) {
+            queryParams.append('dueAt', new Date(dueAt).toISOString());
+        }
+
+        const response = await fetch(`${API_URL}/filter?${queryParams.toString()}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        console.log(`${API_URL}/filter?${queryParams.toString()}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch filtered tasks');
+        }
+
+        return response.json();
     }
 };
 
