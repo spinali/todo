@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import taskService from '../services/taskService';
+import TaskService from "../services/taskService";
 
 const createTaskStore = () => {
     const { subscribe, set } = writable([]);
