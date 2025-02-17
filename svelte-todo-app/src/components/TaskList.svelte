@@ -1,8 +1,9 @@
 <script>
-    import {tasks} from '../store/taskStore';
+    import { tasks } from '../store/taskStore';
+    import { formatDate } from "@fullcalendar/core";
 
     let isEditing = false;
-    let editedTask = {id: null, title: '', description: '', dueAt: ''};
+    let editedTask = { id: null, title: '', description: '', dueAt: '' };
     let completedFilter = null;
     let dueAtFilter = '';
 
@@ -21,7 +22,7 @@
 
     const startEdit = (task) => {
         isEditing = true;
-        editedTask = {...task};
+        editedTask = { ...task };
     };
 
     const handleEdit = async () => {
@@ -56,7 +57,6 @@
     }
 </script>
 
-
 <div class="uk-flex uk-flex-center uk-margin-small-bottom">
     <div class="uk-flex">
         <div class="uk-card uk-card-default uk-padding-small uk-text-center">
@@ -85,7 +85,7 @@
 <div class="uk-grid-match uk-grid-small uk-child-width-1-3@m uk-child-width-1-2@s uk-text-center uk-padding-large margin" uk-grid>
     {#each $tasks as task (task.id)}
         <div>
-            <div class="uk-card uk-card-default uk-card-body uk-text-left  {task.completed ? 'completed' : ''}">
+            <div class="uk-card uk-card-default uk-card-body uk-text-left {task.completed ? 'completed' : ''}">
                 {#if isEditing && editedTask.id === task.id}
                     <h3 class="uk-card-title">Editing Task</h3>
                     <input bind:value={editedTask.title} class="uk-input uk-margin-small" placeholder="Edit title"/>
@@ -93,21 +93,22 @@
                               placeholder="Edit description"></textarea>
                     <input bind:value={editedTask.dueAt} type="datetime-local" class="uk-input uk-margin-small"
                            placeholder="Edit Due Date"/>
-                    <div class="uk-button-group">
+                    <div class="uk-flex uk-flex-center">
                         <button class="uk-button uk-button-primary" on:click={handleEdit}>Save</button>
                         <button class="uk-button uk-button-default" on:click={() => (isEditing = false)}>Cancel</button>
                     </div>
                 {:else}
                     <h3 class="uk-card-title">{task.title}</h3>
-                    <p><strong>Due Date:</strong> {formatEuropeanDate(task.dueAt)}</p>
-
+                    <p class="due-date"><strong>Due Date:</strong> {formatEuropeanDate(task.dueAt)}</p>
+                    <p class="date"><small>Created at: {formatEuropeanDate(task.createdAt)}<br>Last
+                        update: {formatEuropeanDate(task.updatedAt)}</small></p>
                     <div class="uk-overflow-auto uk-height-medium">
                         <pre style="border: none;">
                             {task.description}
                         </pre>
                     </div>
 
-                    <div class="uk-button-group">
+                    <div class="uk-flex uk-flex-center uk-flex-middle uk-margin-top">
                         <button class="uk-button uk-button-secondary" on:click={() => startEdit(task)}>Edit</button>
                         <button class="uk-button uk-button-success" on:click={() => handleStatus(task)}>
                             {task.completed ? 'Done' : 'Pending'}
@@ -131,7 +132,20 @@
         gap: 15px;
     }
 
-    button {
-        margin-left: 10px;
+
+    .date {
+        visibility: hidden;
+    }
+
+    .uk-card:hover .date {
+        visibility: visible;
+    }
+
+    .uk-flex-center {
+        justify-content: center;
+    }
+
+    .uk-margin-top {
+        margin-top: 10px;
     }
 </style>
