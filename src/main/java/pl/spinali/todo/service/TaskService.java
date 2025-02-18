@@ -37,7 +37,9 @@ public class TaskService {
     }
     public TaskResponse updateTask(TaskRequest taskRequest, Long id){
         Task task = taskRepository.findById(id).orElseThrow(RuntimeException::new);
-        task.setCompleted(taskRequest.isCompleted());
+        taskRequest.setCreatedAt(task.getCreatedAt());
+        taskRequest.setCompleted(task.isCompleted());
+        taskRequest.setUpdatedAt(LocalDateTime.now());
         taskRepository.save(taskMapper.toTask(task, taskRequest));
         return taskMapper.toTaskResponse(task);
     }

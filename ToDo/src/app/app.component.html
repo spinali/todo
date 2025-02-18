@@ -1,0 +1,133 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="col-md-12 col-12 col-sm-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>My Tasks</h4>
+
+            </div>
+            <button type="button" class="btn btn-primary m-4" data-toggle="modal" data-target="#addTaskModal">
+                Add task
+            </button>
+            <div class="card-body d-flex flex-column">
+                <div *ngIf="tasks.length>0" class="table-responsive overflow-auto" style="max-height: 400px;">
+                    <table class="table table-striped">
+                        <tbody><tr>
+                            <th class="text-center">
+<!--                                <div class="custom-checkbox custom-checkbox-table custom-control">-->
+<!--                                    <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad" class="custom-control-input" id="checkbox-all">-->
+<!--                                    <label for="checkbox-all" class="custom-control-label">&nbsp;</label>-->
+<!--                                </div>-->
+                            </th>
+                            <th>Task Title</th>
+                            <th>Task Description</th>
+                            <th>Progress</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                        <tr *ngFor="let task of tasks" >
+                            <td class="p-0 text-center">
+<!--                                <div class="custom-checkbox custom-control">-->
+<!--                                    <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-1">-->
+<!--                                    <label for="checkbox-1" class="custom-control-label">&nbsp;</label>-->
+<!--                                </div>-->
+                            </td>
+                            <td>{{task.title}}</td>
+                            <td class="text-truncate" style="max-width: 250px; white-space: pre-line; overflow: hidden;">
+                                {{ task.description }}
+                            </td>
+                            <td [ngClass]="task.completed ? 'text-success' : 'text-danger'">
+                                {{ task.completed ? 'Completed' : 'Pending' }}
+                            </td>
+                            <td>{{ task.dueAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+                            <td>
+                                <a (click)="onCompleteTask(task.id, task.completed)" class="btn btn-success btn-action m-1"><i class="fas fa-square-check"></i></a>
+                                <a (click)="onModalOpen(task)" class="btn btn-primary btn-action m-1" data-toggle="modal" data-target="#editTaskModal" data-original-title="Edit"><i class="fas fa-pencil-alt"></i></a>
+                                <a (click)="onModalOpen(task)" class="btn btn-danger btn-action m-1" data-toggle="modal" data-target="#deleteTaskModal" data-confirm="Are You Sure?|This action can not be undone. Do you want to continue?" data-confirm-yes="alert('Deleted')" data-original-title="Delete"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                        </tbody></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add Task Modal -->
+    <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog d-flex justify-content-center align-items-center min-vh-100">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+                </div>
+                <div class="modal-body">
+                    <form #addForm=ngForm (ngSubmit)="onAddTask(addForm)" id="addTaskForm">
+                        <div class="mb-3">
+                            <label for="taskTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="taskTitle" max="20" ngModel name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="taskDescription" ngModel maxLength="255" name="description" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="taskDueAt" class="form-label">Due Date</label>
+                            <input type="datetime-local" class="form-control" id="taskDueAt" ngModel name="dueAt" required>
+                        </div>
+                        <button type="button" id="add-task-form" class="btn btn-secondary m-1" data-dismiss = "modal">Close</button>
+                        <button [disabled]="addForm.invalid" type="submit" class="btn btn-primary m-1">Add Task</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog d-flex justify-content-center align-items-center min-vh-100">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                </div>
+                <div class="modal-body">
+                    <form #editForm=ngForm id="editTaskForm">
+                        <input type="hidden" ngModel="{{selectedTask?.id}}" name="id" id="id">
+                        <div class="mb-3">
+                            <label for="editTaskTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="editTaskTitle" max="20" ngModel="{{selectedTask?.title}}" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editTaskDescription" maxlength="255" ngModel="{{selectedTask?.description}}" name="description"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTaskDueAt" class="form-label">Due Date</label>
+                            <input type="datetime-local" class="form-control" ngModel="{{selectedTask?.dueAt}}" id="editTaskDueAt" name="dueAt">
+                        </div>
+                        <button (click)="editForm.resetForm(selectedTask)" type="button" id="edit-task-form" class="btn btn-secondary m-1" data-dismiss = "modal">Cancel</button>
+                        <button type="submit" (click)="onUpdateTask(editForm.value)" class="btn btn-primary m-1">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Task Modal -->
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog d-flex justify-content-center align-items-center min-vh-100">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this task?</p>
+                    <form #deleteForm=ngForm id="deleteTaskForm">
+                        <input type="hidden" id="deleteTaskId" ngModel="{{selectedTask?.id}}" name="id">
+                        <button type="button" id="delete-task-form" class="btn btn-secondary m-1" data-dismiss = "modal">Cancel</button>
+                        <button (click)="onDeleteTask(deleteForm.value.id)"  type="submit" class="btn btn-danger m-1">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
